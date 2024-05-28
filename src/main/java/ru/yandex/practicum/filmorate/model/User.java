@@ -5,32 +5,24 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.filmorate.adapter.DurationDeserializer;
-import ru.yandex.practicum.filmorate.adapter.DurationSerializer;
 import ru.yandex.practicum.filmorate.adapter.LocalDateDeserializer;
 import ru.yandex.practicum.filmorate.adapter.LocalDateSerializer;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 /**
- * Film.
+ * User.
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Film {
+public class User {
     int id;
-
+    String email;
+    String login;
     String name;
-
-    String description;
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    LocalDate releaseDate;
-
-    @JsonSerialize(using = DurationSerializer.class)
-    @JsonDeserialize(using = DurationDeserializer.class)
-    Duration duration;
+    LocalDate birthday;
 }
