@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.adapter.DurationDeserializer;
 import ru.yandex.practicum.filmorate.adapter.DurationSerializer;
-import ru.yandex.practicum.filmorate.adapter.LocalDateDeserializer;
 import ru.yandex.practicum.filmorate.adapter.LocalDateSerializer;
 
 import java.time.Duration;
@@ -27,7 +26,6 @@ public class Film {
     String description;
 
     @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     LocalDate releaseDate;
 
     @JsonSerialize(using = DurationSerializer.class)

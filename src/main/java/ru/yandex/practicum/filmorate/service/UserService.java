@@ -35,6 +35,9 @@ public class UserService implements RestService<User> {
     public User create(User user) {
         if (validator.isValid(user)) {
             user.setId(getNextId());
+            if (user.getName() == null) {
+                user.setName(user.getLogin());
+            }
             userMap.put(user.getId(), user);
         }
         return user;
