@@ -12,8 +12,8 @@ import java.util.Map;
 
 @Slf4j
 public class UserService implements RestService<User> {
-    final Map<Integer, User> userMap;
-    final Validator<User> validator;
+    private final Map<Integer, User> userMap;
+    private final Validator<User> validator;
 
     public UserService() {
         this.userMap = new HashMap<>();

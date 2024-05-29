@@ -17,10 +17,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
-    int id;
-    String email;
-    String login;
-    String name;
+    private int id;
+    private String email;
+    private String login;
+    private String name;
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)

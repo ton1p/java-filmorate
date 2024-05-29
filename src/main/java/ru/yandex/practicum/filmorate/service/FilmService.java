@@ -12,8 +12,8 @@ import java.util.Map;
 
 @Slf4j
 public class FilmService implements RestService<Film> {
-    final Map<Integer, Film> filmMap;
-    final Validator<Film> validator;
+    private final Map<Integer, Film> filmMap;
+    private final Validator<Film> validator;
 
     public FilmService() {
         this.filmMap = new HashMap<>();

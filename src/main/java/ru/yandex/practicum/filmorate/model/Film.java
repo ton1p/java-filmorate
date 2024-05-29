@@ -19,16 +19,16 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Film {
-    int id;
+    private int id;
 
-    String name;
+    private String name;
 
-    String description;
+    private String description;
 
     @JsonSerialize(using = LocalDateSerializer.class)
-    LocalDate releaseDate;
+    private LocalDate releaseDate;
 
     @JsonSerialize(using = DurationSerializer.class)
     @JsonDeserialize(using = DurationDeserializer.class)
-    Duration duration;
+    private Duration duration;
 }
