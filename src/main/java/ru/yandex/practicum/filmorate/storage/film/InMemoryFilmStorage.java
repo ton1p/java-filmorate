@@ -1,6 +1,7 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
@@ -11,11 +12,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-public class FilmService implements RestService<Film> {
+@Component
+public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> filmMap;
     private final Validator<Film> validator;
 
-    public FilmService() {
+    public InMemoryFilmStorage() {
         this.filmMap = new HashMap<>();
         this.validator = new FilmValidator();
     }
@@ -32,6 +34,18 @@ public class FilmService implements RestService<Film> {
     }
 
     @Override
+    public Film getById(int id) {
+        Film film = filmMap.get(id);
+
+        if (film == null) {
+            log.error("Фильм с id {} не найден", id);
+            throw new NotFoundException(String.format("Фильм с id %s не найден", id));
+        }
+
+        return film;
+    }
+
+    @Override
     public Film create(Film film) {
         if (validator.isValid(film)) {
             film.setId(getNextId());
@@ -42,15 +56,10 @@ public class FilmService implements RestService<Film> {
 
     @Override
     public Film update(Film film) {
-        Film filmFound = filmMap.get(film.getId());
-
-        if (filmFound == null) {
-            log.error("Фильм с id {} не найден", film.getId());
-            throw new NotFoundException(String.format("Фильм с id %s не найден", film.getId()));
-        }
+        Film filmToUpdate = getById(film.getId());
 
         if (validator.isValid(film)) {
-            filmMap.put(filmFound.getId(), film);
+            filmMap.put(filmToUpdate.getId(), film);
         }
 
         return film;

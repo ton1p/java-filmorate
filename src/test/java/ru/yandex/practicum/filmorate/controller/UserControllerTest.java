@@ -5,8 +5,13 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,7 +21,9 @@ class UserControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        userController = new UserController();
+        UserStorage userStorage = new InMemoryUserStorage();
+        UserService userService = new UserServiceImpl(userStorage);
+        userController = new UserController(userStorage, userService);
     }
 
     @Test
@@ -26,13 +33,31 @@ class UserControllerTest {
 
     @Test
     void createUser() {
-        userController.createUser(new User(1, "test@test.com", "login", "name", LocalDate.now()));
+        userController.createUser(User
+                .builder()
+                .id(1)
+                .email("test@test.com")
+                .login("login")
+                .name("name")
+                .birthday(LocalDate.now())
+                .friends(new HashSet<>())
+                .build()
+        );
         assertEquals(1, userController.getUsers().size());
     }
 
     @Test
     void updateUser() {
-        User user = new User(1, "test@test.com", "login", "name", LocalDate.now());
+        User user = User
+                .builder()
+                .id(1)
+                .email("test@test.com")
+                .login("login")
+                .name("name")
+                .birthday(LocalDate.now())
+                .friends(new HashSet<>())
+                .build();
+
         userController.createUser(user);
         user.setName("updated");
         User updated = userController.updateUser(user);
@@ -42,17 +67,27 @@ class UserControllerTest {
 
     @Test
     void shouldThrowNotFoundExceptionWhenUpdatingByWrongId() {
-        User user = new User(1, "test@test.com", "login", "name", LocalDate.now());
+        User user = User
+                .builder()
+                .id(1)
+                .email("test@test.com")
+                .login("login")
+                .name("name")
+                .friends(new HashSet<>())
+                .build();
+
         assertThrows(NotFoundException.class, () -> userController.updateUser(user));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenEmailIsNullOrEmpty() {
-        User user = new User();
-        user.setId(1);
-        user.setName("test");
-        user.setLogin("test");
-        user.setBirthday(LocalDate.now());
+        User user = User
+                .builder()
+                .id(1)
+                .name("name")
+                .login("login")
+                .birthday(LocalDate.now())
+                .build();
 
         assertThrows(ValidationException.class, () -> userController.createUser(user));
 
@@ -63,23 +98,27 @@ class UserControllerTest {
 
     @Test
     void shouldThrowValidationExceptionWhenEmailIsIncorrect() {
-        User user = new User();
-        user.setId(1);
-        user.setName("test");
-        user.setLogin("test");
-        user.setBirthday(LocalDate.now());
-        user.setEmail("test");
+        User user = User
+                .builder()
+                .id(1)
+                .name("name")
+                .login("login")
+                .birthday(LocalDate.now())
+                .email("test")
+                .build();
 
         assertThrows(ValidationException.class, () -> userController.createUser(user));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenLoginIsNullOrEmpty() {
-        User user = new User();
-        user.setId(1);
-        user.setName("test");
-        user.setBirthday(LocalDate.now());
-        user.setEmail("test@test.com");
+        User user = User
+                .builder()
+                .id(1)
+                .name("name")
+                .birthday(LocalDate.now())
+                .email("test@test.com")
+                .build();
 
         assertThrows(ValidationException.class, () -> userController.createUser(user));
 

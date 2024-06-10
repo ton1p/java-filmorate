@@ -5,9 +5,16 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,7 +24,10 @@ class FilmControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        filmController = new FilmController();
+        FilmStorage filmStorage = new InMemoryFilmStorage();
+        UserStorage userStorage = new InMemoryUserStorage();
+        FilmService filmService = new FilmServiceImpl(filmStorage, userStorage);
+        filmController = new FilmController(filmStorage, filmService);
     }
 
     @Test
@@ -27,26 +37,69 @@ class FilmControllerTest {
 
     @Test
     void getFilms() {
-        filmController.createFilm(new Film(1, "test", "test", LocalDate.now(), Duration.ofMinutes(90)));
+        filmController.createFilm(Film.builder()
+                .id(1)
+                .name("test")
+                .description("test")
+                .releaseDate(LocalDate.now())
+                .duration(Duration.ofMinutes(90))
+                .likes(new HashSet<>())
+                .build()
+        );
         assertEquals(1, filmController.getFilms().size());
     }
 
     @Test
     void createFilm() {
-        Film film = filmController.createFilm(new Film(1, "test", "test", LocalDate.now(), Duration.ofMinutes(90)));
+        Film film = filmController.createFilm(
+                Film.builder()
+                        .id(1)
+                        .name("test")
+                        .description("test")
+                        .releaseDate(LocalDate.now())
+                        .duration(Duration.ofMinutes(90))
+                        .likes(new HashSet<>())
+                        .build()
+        );
         assertEquals("test", film.getName());
     }
 
     @Test
     void updateFilm() {
-        filmController.createFilm(new Film(1, "test", "test", LocalDate.now(), Duration.ofMinutes(90)));
-        Film updated = filmController.updateFilm(new Film(1, "test updated", "test", LocalDate.now(), Duration.ofMinutes(90)));
+        filmController.createFilm(
+                Film.builder()
+                        .id(1)
+                        .name("test")
+                        .description("test")
+                        .releaseDate(LocalDate.now())
+                        .duration(Duration.ofMinutes(90))
+                        .likes(new HashSet<>())
+                        .build()
+        );
+        Film updated = filmController.updateFilm(
+                Film.builder()
+                        .id(1)
+                        .name("test updated")
+                        .description("test")
+                        .releaseDate(LocalDate.now())
+                        .duration(Duration.ofMinutes(90))
+                        .likes(new HashSet<>())
+                        .build()
+        );
         assertEquals("test updated", updated.getName());
     }
 
     @Test
     void shouldThrowNotFoundExceptionWhenUpdatingByWrongId() {
-        Film film = new Film(1, "test", "test", LocalDate.now(), Duration.ofMinutes(90));
+        Film film = Film.builder()
+                .id(1)
+                .name("test")
+                .description("test")
+                .releaseDate(LocalDate.now())
+                .duration(Duration.ofMinutes(90))
+                .likes(new HashSet<>())
+                .build();
+
         assertThrows(NotFoundException.class, () -> filmController.updateFilm(film));
     }
 
