@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
 
@@ -22,44 +21,47 @@ import java.util.Collection;
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     @GetMapping
     public Collection<Film> getFilms() {
         log.info("Получение всех фильмов");
-        return filmStorage.getAll();
+        return filmService.getAll();
     }
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable("id") int id) {
-        return filmStorage.getById(id);
+        log.info("Получение фильма по id = {}", id);
+        return filmService.getById(id);
     }
 
     @PostMapping
     public Film createFilm(@RequestBody Film body) {
         log.info("Создание нового фильма");
-        return filmStorage.create(body);
+        return filmService.create(body);
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film body) {
         log.info("Обновление фильма");
-        return filmStorage.update(body);
+        return filmService.update(body);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void likeFilm(@PathVariable("id") int id, @PathVariable("userId") int userId) {
+        log.info("Юзер с id = {} ставит лайк фильму с id = {}", userId, id);
         filmService.likeFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void unlikeFilm(@PathVariable("id") int id, @PathVariable("userId") int userId) {
+        log.info("Юзеру с id = {} больше не нравится фильм с id = {}", userId, id);
         filmService.unlikeFilm(id, userId);
     }
 
     @GetMapping("/popular")
     public Collection<Film> getFilmsPopular(@RequestParam(defaultValue = "10") int count) {
+        log.info("Получение самых популярных фильмов с параметром count = {}", count);
         return filmService.getPopular(count);
     }
 }

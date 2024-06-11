@@ -27,7 +27,7 @@ public class User {
 
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
-    LocalDate birthday;
+    private LocalDate birthday;
 
     private Set<Integer> friends;
 }

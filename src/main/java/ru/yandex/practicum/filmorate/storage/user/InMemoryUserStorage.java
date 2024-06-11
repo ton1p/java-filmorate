@@ -1,30 +1,32 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
-import ru.yandex.practicum.filmorate.validator.Validator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
-@Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Integer, User> userMap;
-    private final Validator<User> validator;
 
     public InMemoryUserStorage() {
         this.userMap = new HashMap<>();
-        this.validator = new UserValidator();
     }
 
-    @Override
     public int getNextId() {
-        int currentMaxId = userMap.keySet().stream().mapToInt(value -> value).max().orElse(0);
+        int currentMaxId = userMap.keySet()
+                .stream()
+                .mapToInt(value -> value)
+                .max()
+                .orElse(0);
+
         return ++currentMaxId;
     }
 
@@ -34,37 +36,93 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getById(int id) {
+    public Optional<User> getById(int id) {
         User user = userMap.get(id);
 
         if (user == null) {
-            log.error("Пользователь с id {} не найден", id);
-            throw new NotFoundException(String.format("Пользователь с id %s не найден", id));
+            return Optional.empty();
         }
 
-        return user;
+        return Optional.of(user);
     }
 
     @Override
     public User create(User user) {
-        if (validator.isValid(user)) {
-            user.setId(getNextId());
-            if (user.getName() == null) {
-                user.setName(user.getLogin());
-            }
-            userMap.put(user.getId(), user);
+        user.setId(getNextId());
+        if (user.getName() == null) {
+            user.setName(user.getLogin());
         }
+        userMap.put(user.getId(), user);
         return user;
     }
 
     @Override
     public User update(User user) {
-        User userFound = getById(user.getId());
+        userMap.put(user.getId(), user);
+        return user;
+    }
 
-        if (validator.isValid(user)) {
-            userMap.put(userFound.getId(), user);
+    @Override
+    public void addFriend(User user, User friend) {
+        Set<Integer> userFriends = user.getFriends();
+        if (userFriends == null) {
+            userFriends = new HashSet<>();
+        }
+        userFriends.add(friend.getId());
+        user.setFriends(userFriends);
+
+        Set<Integer> friendFriends = friend.getFriends();
+        if (friendFriends == null) {
+            friendFriends = new HashSet<>();
+        }
+        friendFriends.add(user.getId());
+        friend.setFriends(friendFriends);
+    }
+
+    @Override
+    public void removeFriend(User user, User friend) {
+        Set<Integer> userFriends = user.getFriends();
+        if (userFriends != null) {
+            userFriends.remove(friend.getId());
+            user.setFriends(userFriends);
         }
 
-        return user;
+        Set<Integer> friendFriends = friend.getFriends();
+        if (friendFriends != null) {
+            friendFriends.remove(user.getId());
+            friend.setFriends(friendFriends);
+        }
+    }
+
+    @Override
+    public List<User> getFriends(User user) {
+        Set<Integer> userFriends = user.getFriends();
+
+        if (userFriends != null && !userFriends.isEmpty()) {
+            return user.getFriends()
+                    .stream()
+                    .map(this::getById)
+                    .map(u -> u.orElse(null))
+                    .toList();
+        }
+
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<User> getCommonFriends(User user, User other) {
+        Set<Integer> userFriends = user.getFriends();
+        Set<Integer> otherUserFriends = other.getFriends();
+
+        if (userFriends != null && otherUserFriends != null) {
+            return userFriends
+                    .stream()
+                    .filter(otherUserFriends::contains)
+                    .map(this::getById)
+                    .map(u -> u.orElse(null))
+                    .toList();
+        }
+
+        return List.of();
     }
 }

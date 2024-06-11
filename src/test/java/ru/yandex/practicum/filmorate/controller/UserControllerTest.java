@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -22,8 +23,9 @@ class UserControllerTest {
     @BeforeEach
     void beforeEach() {
         UserStorage userStorage = new InMemoryUserStorage();
-        UserService userService = new UserServiceImpl(userStorage);
-        userController = new UserController(userStorage, userService);
+        UserValidator userValidator = new UserValidator();
+        UserService userService = new UserServiceImpl(userStorage, userValidator);
+        userController = new UserController(userService);
     }
 
     @Test
