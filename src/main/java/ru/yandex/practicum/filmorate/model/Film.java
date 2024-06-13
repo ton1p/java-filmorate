@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.adapter.DurationDeserializer;
@@ -11,11 +12,13 @@ import ru.yandex.practicum.filmorate.adapter.LocalDateSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Film.
  */
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Film {
@@ -31,4 +34,6 @@ public class Film {
     @JsonSerialize(using = DurationSerializer.class)
     @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
+
+    private Set<Integer> likes;
 }
