@@ -1,5 +1,5 @@
 # Filmorate
 
-## Entity relationship
+### Entity relationship
 
 ![entity relationship](./filmorate.png)
