@@ -2,4 +2,4 @@
 
 ### Entity relationship
 
-![entity relationship](./filmorate.png)
+![entity relationship](src/main/resources/filmorate.png)
