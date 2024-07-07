@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -11,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -27,25 +28,20 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film getById(int id) {
-        Optional<Film> film = filmStorage.getById(id);
-        if (film.isEmpty()) {
+        return filmStorage.getById(id).orElseThrow(() -> {
             log.error("Фильм с id {} не найден", id);
-            throw new NotFoundException(String.format("Фильм с id %s не найден", id));
-        }
-        return film.get();
+            return new NotFoundException(String.format("Фильм с id %s не найден", id));
+        });
     }
 
     @Override
-    public Film create(Film film) {
-        return filmStorage.create(film);
+    public Film create(CreateFilmDto createFilmDto) {
+        return filmStorage.create(createFilmDto);
     }
 
     @Override
-    public Film update(Film film) {
-        if (getById(film.getId()) != null) {
-            return filmStorage.update(film);
-        }
-        return null;
+    public Film update(UpdateFilmDto updateFilmDto) {
+        return filmStorage.update(updateFilmDto);
     }
 
     @Override

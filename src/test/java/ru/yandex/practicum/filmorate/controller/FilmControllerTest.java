@@ -2,8 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
@@ -13,7 +16,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.validator.user.UserValidator;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -42,54 +45,62 @@ class FilmControllerTest {
 
     @Test
     void getFilms() {
-        filmController.createFilm(Film.builder()
+        Film film = Film.builder()
                 .id(1)
                 .name("test")
                 .description("test")
                 .releaseDate(LocalDate.now())
                 .duration(Duration.ofMinutes(90))
                 .likes(new HashSet<>())
-                .build()
+                .build();
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
+        filmController.createFilm(createFilmDto
         );
         assertEquals(1, filmController.getFilms().size());
     }
 
     @Test
     void createFilm() {
+        Film film1 = Film.builder()
+                .id(1)
+                .name("test")
+                .description("test")
+                .releaseDate(LocalDate.now())
+                .duration(Duration.ofMinutes(90))
+                .likes(new HashSet<>())
+                .build();
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film1);
         Film film = filmController.createFilm(
-                Film.builder()
-                        .id(1)
-                        .name("test")
-                        .description("test")
-                        .releaseDate(LocalDate.now())
-                        .duration(Duration.ofMinutes(90))
-                        .likes(new HashSet<>())
-                        .build()
+                createFilmDto
         );
         assertEquals("test", film.getName());
     }
 
     @Test
     void updateFilm() {
+        Film film = Film.builder()
+                .id(1)
+                .name("test")
+                .description("test")
+                .releaseDate(LocalDate.now())
+                .duration(Duration.ofMinutes(90))
+                .likes(new HashSet<>())
+                .build();
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
         filmController.createFilm(
-                Film.builder()
-                        .id(1)
-                        .name("test")
-                        .description("test")
-                        .releaseDate(LocalDate.now())
-                        .duration(Duration.ofMinutes(90))
-                        .likes(new HashSet<>())
-                        .build()
+                createFilmDto
         );
+        Film updatedFilm = Film.builder()
+                .id(1)
+                .name("test updated")
+                .description("test")
+                .releaseDate(LocalDate.now())
+                .duration(Duration.ofMinutes(90))
+                .likes(new HashSet<>())
+                .build();
+        UpdateFilmDto updateFilmDto = FilmMapper.INSTANCE.filmToUpdateFilmDto(updatedFilm);
         Film updated = filmController.updateFilm(
-                Film.builder()
-                        .id(1)
-                        .name("test updated")
-                        .description("test")
-                        .releaseDate(LocalDate.now())
-                        .duration(Duration.ofMinutes(90))
-                        .likes(new HashSet<>())
-                        .build()
+                updateFilmDto
         );
         assertEquals("test updated", updated.getName());
     }
@@ -105,7 +116,9 @@ class FilmControllerTest {
                 .likes(new HashSet<>())
                 .build();
 
-        assertThrows(NotFoundException.class, () -> filmController.updateFilm(film));
+        UpdateFilmDto updateFilmDto = FilmMapper.INSTANCE.filmToUpdateFilmDto(film);
+
+        assertThrows(NotFoundException.class, () -> filmController.updateFilm(updateFilmDto));
     }
 
     @Test
@@ -116,10 +129,12 @@ class FilmControllerTest {
         film.setDuration(Duration.ofMinutes(90));
         film.setReleaseDate(LocalDate.now());
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
+
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
 
         film.setName("");
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
     }
 
     @Test
@@ -130,10 +145,12 @@ class FilmControllerTest {
         film.setDuration(Duration.ofMinutes(90));
         film.setReleaseDate(LocalDate.now());
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
+
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
 
         film.setDescription("");
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
     }
 
     @Test
@@ -145,7 +162,9 @@ class FilmControllerTest {
         film.setDuration(Duration.ofMinutes(90));
         film.setReleaseDate(LocalDate.now());
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
+
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
     }
 
     @Test
@@ -155,8 +174,9 @@ class FilmControllerTest {
         film.setName("test");
         film.setDescription("test");
         film.setDuration(Duration.ofMinutes(90));
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
     }
 
     @Test
@@ -167,8 +187,9 @@ class FilmControllerTest {
         film.setDescription("test");
         film.setDuration(Duration.ofMinutes(90));
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
     }
 
     @Test
@@ -178,8 +199,9 @@ class FilmControllerTest {
         film.setName("test");
         film.setDescription("test");
         film.setReleaseDate(LocalDate.now());
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
     }
 
     @Test
@@ -191,10 +213,11 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.now());
         film.setDuration(Duration.ofMinutes(0));
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film);
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
 
         film.setDuration(Duration.ofMinutes(-1));
 
-        assertThrows(ValidationException.class, () -> filmController.createFilm(film));
+        assertThrows(ValidationException.class, () -> filmController.createFilm(createFilmDto));
     }
 }

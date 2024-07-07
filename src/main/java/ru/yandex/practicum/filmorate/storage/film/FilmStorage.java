@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -12,9 +14,9 @@ public interface FilmStorage {
 
     Optional<Film> getById(int id);
 
-    Film create(Film film);
+    Film create(CreateFilmDto createFilmDto);
 
-    Film update(Film film);
+    Film update(UpdateFilmDto updateFilmDto);
 
     void likeFilm(Film film, User user);
 

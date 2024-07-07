@@ -2,10 +2,14 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
 import ru.yandex.practicum.filmorate.validator.Validator;
+import ru.yandex.practicum.filmorate.validator.film.InMemoryFilmValidator;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -24,7 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public InMemoryFilmStorage() {
         this.filmMap = new HashMap<>();
-        this.validator = new FilmValidator();
+        this.validator = new InMemoryFilmValidator();
     }
 
     public int getNextId() {
@@ -49,7 +53,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(Film film) {
+    public Film create(CreateFilmDto createFilmDto) {
+        Film film = FilmMapper.INSTANCE.createFilmDtoToFilm(createFilmDto);
         if (validator.isValid(film)) {
             film.setId(getNextId());
             filmMap.put(film.getId(), film);
@@ -58,7 +63,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(Film film) {
+    public Film update(UpdateFilmDto updateFilmDto) {
+        Film film = FilmMapper.INSTANCE.updateFilmDtoToFilm(updateFilmDto);
+        Film filmFromMap = filmMap.get(film.getId());
+        if (filmFromMap == null) {
+            throw new NotFoundException("Фильм с id =" + film.getId() + "не найден");
+        }
         if (validator.isValid(film)) {
             filmMap.put(film.getId(), film);
         }

@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.validator.user.UserValidator;
 
 import java.time.LocalDate;
 import java.util.HashSet;
