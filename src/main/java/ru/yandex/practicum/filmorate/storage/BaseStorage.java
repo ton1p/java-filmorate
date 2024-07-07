@@ -24,7 +24,7 @@ public class BaseStorage<T> {
     }
 
     protected List<T> findMany(final String query, Object... args) {
-        return jdbcTemplate.query(query, mapper, args);
+        return jdbcTemplate.query(query, extractor, args);
     }
 
     protected Optional<T> findOne(final String query, Object... args) {

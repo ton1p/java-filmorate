@@ -139,6 +139,9 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
 
     @Override
     public List<Film> getPopular(int count) {
-        return List.of();
+        return findMany(GET_ALL_QUERY).stream()
+                .sorted(
+                        (film1, film2) -> film2.getLikes().size() - film1.getLikes().size()
+                ).toList();
     }
 }
