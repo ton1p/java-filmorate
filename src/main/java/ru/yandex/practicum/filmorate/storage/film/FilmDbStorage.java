@@ -37,15 +37,13 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
             "left join \"films_genres\" fg on f.\"id\" = fg.\"film_id\" " +
             "left join \"genre\" g on fg.\"genre_id\" = g.\"id\"";
 
+    private static final String GET_BY_ID_QUERY = GET_ALL_QUERY + " where f.\"id\" = ?";
+
     private static final String CREATE_FILM_QUERY = "insert into \"film\" (\"name\", \"description\", \"release_date\", \"duration\", \"mpa\") VALUES (?, ?, ?, ?, ?)";
 
     private static final String ADD_FILM_GENRE_QUERY = "insert into \"films_genres\" (\"film_id\", \"genre_id\") values (?, ?)";
 
     private static final String UPDATE_FILM_QUERY = "update \"film\" set \"name\" = ?, \"description\" = ?, \"release_date\" = ?, \"duration\" = ?, \"mpa\" = ? where \"id\" = ?;";
-
-    public static String getAllQueryStringWithId() {
-        return GET_ALL_QUERY + " where f.\"id\" = ?";
-    }
 
     private final Validator<Film> filmValidator;
 
@@ -66,7 +64,7 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
 
     @Override
     public Optional<Film> getById(int id) {
-        return findOne(getAllQueryStringWithId(), id);
+        return findOne(GET_BY_ID_QUERY, id);
     }
 
     public void addGenresToFilm(int filmId, List<ObjectWithIdDto> genres) {
@@ -98,7 +96,7 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
                     createFilmDto.getMpa().getId()
             );
             addGenresToFilm(id, createFilmDto.getGenres());
-            Optional<Film> createdFilm = findOne(getAllQueryStringWithId(), id);
+            Optional<Film> createdFilm = findOne(GET_BY_ID_QUERY, id);
             return createdFilm.orElse(null);
         }
         return null;
@@ -106,7 +104,7 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
 
     @Override
     public Film update(UpdateFilmDto updateFilmDto) {
-        Optional<Film> founded = findOne(getAllQueryStringWithId(), updateFilmDto.getId());
+        Optional<Film> founded = findOne(GET_BY_ID_QUERY, updateFilmDto.getId());
         if (founded.isEmpty()) {
             throw new NotFoundException("Фильм с id = " + updateFilmDto.getId() + " не найден");
         }
@@ -122,7 +120,7 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
                     updateFilmDto.getId()
             );
 
-            return findOne(getAllQueryStringWithId(), updateFilmDto.getId()).orElse(null);
+            return findOne(GET_BY_ID_QUERY, updateFilmDto.getId()).orElse(null);
         }
         return null;
     }
