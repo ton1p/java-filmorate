@@ -49,9 +49,11 @@ public class FilmExtractor implements ResultSetExtractor<List<Film>> {
                     genres.add(new Genre(genreId, genreName));
                     film.setGenres(genres);
                 }
-                Set<Integer> likes = film.getLikes();
-                likes.add(userIdLike);
-                filmFromMap.setLikes(likes);
+                if (userIdLike != 0) {
+                    Set<Integer> likes = film.getLikes();
+                    likes.add(userIdLike);
+                    filmFromMap.setLikes(likes);
+                }
             } else {
                 Set<Integer> genreIds = new HashSet<>();
                 genreIds.add(genreId);

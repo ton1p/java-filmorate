@@ -68,6 +68,9 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
     }
 
     public void addGenresToFilm(int filmId, List<ObjectWithIdDto> genres) {
+        if (genres == null || genres.isEmpty()) {
+            return;
+        }
         jdbcTemplate.batchUpdate(ADD_FILM_GENRE_QUERY, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -127,12 +130,14 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
 
     @Override
     public void likeFilm(Film film, User user) {
-
+        String query = "insert into \"likes\" (\"user_id\", \"film_id\") VALUES (?, ?)";
+        update(query, user.getId(), film.getId());
     }
 
     @Override
     public void unlikeFilm(Film film, User user) {
-
+        String query = "delete from \"likes\" where \"film_id\" = ? and \"user_id\" = ?";
+        update(query, film.getId(), user.getId());
     }
 
     @Override

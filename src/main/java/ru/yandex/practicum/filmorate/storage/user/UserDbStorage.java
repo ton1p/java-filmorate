@@ -16,6 +16,8 @@ import java.util.Optional;
 @Primary
 public class UserDbStorage extends BaseStorage<User> implements UserStorage {
     private static final String GET_ALL_QUERY = "select u.*, uf.\"friend_id\" as friend_id from \"user\" u left join \"users_friends\" uf on u.\"id\" = uf.\"user_id\"";
+    private static final String CREATE_QUERY = "insert into \"user\" (\"email\", \"login\", \"name\", \"birthday\") values (?, ?, ?, ?)";
+    private static final String UPDATE_QUERY = "update \"user\" set \"email\" = ?, \"login\" = ?, \"name\" = ?, \"birthday\" = ? where \"id\" = ?";
 
     public UserDbStorage(JdbcTemplate jdbcTemplate, RowMapper<User> mapper, ResultSetExtractor<List<User>> extractor) {
         super(jdbcTemplate, mapper, extractor);
@@ -33,12 +35,27 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
 
     @Override
     public User create(User user) {
-        return null;
+        int id = insert(
+                CREATE_QUERY,
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday().toString()
+        );
+        return getById(id).orElse(null);
     }
 
     @Override
     public User update(User user) {
-        return null;
+        update(
+                UPDATE_QUERY,
+                user.getEmail(),
+                user.getLogin(),
+                user.getName(),
+                user.getBirthday().toString(),
+                user.getId()
+        );
+        return getById(user.getId()).orElse(null);
     }
 
     @Override
