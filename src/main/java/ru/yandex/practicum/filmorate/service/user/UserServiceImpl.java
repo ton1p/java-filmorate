@@ -3,7 +3,10 @@ package ru.yandex.practicum.filmorate.service.user;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.user.UserValidator;
@@ -35,17 +38,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(User user) {
+    public User create(CreateUserDto createUserDto) {
+        User user = UserMapper.INSTANCE.createUserDtoToUser(createUserDto);
         if (userValidator.isValid(user)) {
-            return userStorage.create(user);
+            return userStorage.create(createUserDto);
         }
         return null;
     }
 
     @Override
-    public User update(User user) {
+    public User update(UpdateUserDto updateUserDto) {
+        User user = UserMapper.INSTANCE.updateUserDtoToUser(updateUserDto);
         if (getById(user.getId()) != null && userValidator.isValid(user)) {
-            return userStorage.update(user);
+            return userStorage.update(updateUserDto);
         }
         return null;
     }

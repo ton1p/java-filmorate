@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.NonNull;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -67,13 +68,13 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
         return findOne(GET_BY_ID_QUERY, id);
     }
 
-    public void addGenresToFilm(int filmId, List<ObjectWithIdDto> genres) {
+    private void addGenresToFilm(int filmId, List<ObjectWithIdDto> genres) {
         if (genres == null || genres.isEmpty()) {
             return;
         }
         jdbcTemplate.batchUpdate(ADD_FILM_GENRE_QUERY, new BatchPreparedStatementSetter() {
             @Override
-            public void setValues(PreparedStatement ps, int i) throws SQLException {
+            public void setValues(@NonNull PreparedStatement ps, int i) throws SQLException {
                 ObjectWithIdDto genre = genres.get(i);
                 ps.setInt(1, filmId);
                 ps.setInt(2, genre.getId());

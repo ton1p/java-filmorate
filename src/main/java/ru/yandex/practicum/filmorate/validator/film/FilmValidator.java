@@ -33,17 +33,13 @@ public class FilmValidator implements Validator<Film> {
         if (filmMpa != null) {
             mpaStorage.getById(
                     filmMpa.getId()
-            ).orElseThrow(() -> {
-                throw new ValidationException("Рейтинг с id = " + filmMpa.getId() + " не найден");
-            });
+            ).orElseThrow(() -> new ValidationException("Рейтинг с id = " + filmMpa.getId() + " не найден"));
         }
 
         List<Genre> filmGenres = film.getGenres();
         if (filmGenres != null && !filmGenres.isEmpty()) {
             filmGenres.forEach(
-                    genre -> genreStorage.getById(genre.getId()).orElseThrow(() -> {
-                        throw new ValidationException("Жанр с id = " + genre.getId() + " не найден");
-                    })
+                    genre -> genreStorage.getById(genre.getId()).orElseThrow(() -> new ValidationException("Жанр с id = " + genre.getId() + " не найден"))
             );
         }
 

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 
@@ -35,13 +37,13 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@RequestBody User body) {
+    public User createUser(@RequestBody CreateUserDto body) {
         log.info("Создание нового пользователя");
         return userService.create(body);
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User body) {
+    public User updateUser(@RequestBody UpdateUserDto body) {
         log.info("Обновление пользователя");
         return userService.update(body);
     }

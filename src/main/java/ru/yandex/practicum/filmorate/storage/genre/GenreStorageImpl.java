@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public class GenreStorageImpl extends BaseStorage<Genre> implements GenreStorage {
     private static final String GET_ALL_QUERY = "select * from \"genre\"";
+    private static final String CREATE_QUERY = "insert into \"genre\" (\"name\") values (?)";
 
     public GenreStorageImpl(JdbcTemplate jdbcTemplate, RowMapper<Genre> mapper, ResultSetExtractor<List<Genre>> extractor) {
         super(jdbcTemplate, mapper, extractor);
@@ -26,5 +27,11 @@ public class GenreStorageImpl extends BaseStorage<Genre> implements GenreStorage
     @Override
     public Optional<Genre> getById(int id) {
         return findOne(GET_ALL_QUERY + " where \"id\" = ?", id);
+    }
+
+    @Override
+    public Genre add(String name) {
+        int id = insert(CREATE_QUERY, name);
+        return getById(id).orElse(null);
     }
 }

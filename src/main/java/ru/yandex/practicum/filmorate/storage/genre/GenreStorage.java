@@ -9,4 +9,6 @@ public interface GenreStorage {
     List<Genre> getAll();
 
     Optional<Genre> getById(int id);
+
+    Genre add(String name);
 }

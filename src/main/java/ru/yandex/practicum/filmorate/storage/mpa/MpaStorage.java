@@ -9,4 +9,6 @@ public interface MpaStorage {
     List<Mpa> getAll();
 
     Optional<Mpa> getById(int id);
+
+    Mpa add(String name);
 }

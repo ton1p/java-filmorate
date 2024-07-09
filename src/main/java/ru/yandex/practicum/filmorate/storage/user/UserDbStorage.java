@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
@@ -14,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Repository
 @Primary
@@ -38,28 +41,28 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
     }
 
     @Override
-    public User create(User user) {
+    public User create(CreateUserDto createUserDto) {
         int id = insert(
                 CREATE_QUERY,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday().toString()
+                createUserDto.getEmail(),
+                createUserDto.getLogin(),
+                createUserDto.getName(),
+                createUserDto.getBirthday().toString()
         );
         return getById(id).orElse(null);
     }
 
     @Override
-    public User update(User user) {
+    public User update(UpdateUserDto updateUserDto) {
         update(
                 UPDATE_QUERY,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday().toString(),
-                user.getId()
+                updateUserDto.getEmail(),
+                updateUserDto.getLogin(),
+                updateUserDto.getName(),
+                updateUserDto.getBirthday().toString(),
+                updateUserDto.getId()
         );
-        return getById(user.getId()).orElse(null);
+        return getById(updateUserDto.getId()).orElse(null);
     }
 
     @Override
@@ -90,9 +93,12 @@ public class UserDbStorage extends BaseStorage<User> implements UserStorage {
     public List<User> getCommonFriends(User user, User other) {
         Set<Integer> userFriends = user.getFriends();
         Set<Integer> otherFriends = other.getFriends();
+        Set<Integer> commonIds = userFriends.stream().filter(otherFriends::contains).collect(Collectors.toSet());
+
+        String params = commonIds.stream().reduce("", (acc, item) -> (!acc.isEmpty() ? (acc + ",") : acc) + "?", (a, b) -> a + b);
         return findMany(
-                GET_ALL_QUERY + " where u.\"id\" in (?)",
-                userFriends.stream().filter(otherFriends::contains).distinct().toArray()
+                GET_ALL_QUERY + " where u.\"id\" in " + "(" + params + ")",
+                commonIds.toArray()
         );
     }
 }

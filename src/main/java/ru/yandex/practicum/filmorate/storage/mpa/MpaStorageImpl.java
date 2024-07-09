@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public class MpaStorageImpl extends BaseStorage<Mpa> implements MpaStorage {
     private static final String GET_ALL_QUERY = "select * from \"mpa\"";
+    private static final String CREATE_QUERY = "insert into \"mpa\" (\"name\") values (?)";
 
     public MpaStorageImpl(JdbcTemplate jdbcTemplate, RowMapper<Mpa> mapper, ResultSetExtractor<List<Mpa>> extractor) {
         super(jdbcTemplate, mapper, extractor);
@@ -26,5 +27,11 @@ public class MpaStorageImpl extends BaseStorage<Mpa> implements MpaStorage {
     @Override
     public Optional<Mpa> getById(int id) {
         return findOne(GET_ALL_QUERY + " where(\"id\" = ?)", id);
+    }
+
+    @Override
+    public Mpa add(String name) {
+        int id = insert(CREATE_QUERY, name);
+        return getById(id).orElse(null);
     }
 }
