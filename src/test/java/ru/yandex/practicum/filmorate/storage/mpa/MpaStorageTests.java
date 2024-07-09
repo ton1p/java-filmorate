@@ -24,20 +24,7 @@ class MpaStorageTests {
     @Test
     void getAll() {
         List<Mpa> mpaList = mpaStorage.getAll();
-        Assertions.assertEquals(0, mpaList.size());
-    }
-
-    @Test
-    void getAllWithItems() {
-        mpaStorage.add("test");
-        mpaStorage.add("test1");
-        mpaStorage.add("test2");
-
-        List<Mpa> mpaList = mpaStorage.getAll();
-        Assertions.assertEquals(3, mpaList.size());
-        Assertions.assertEquals("test", mpaList.get(0).getName());
-        Assertions.assertEquals("test1", mpaList.get(1).getName());
-        Assertions.assertEquals("test2", mpaList.get(2).getName());
+        Assertions.assertEquals(5, mpaList.size());
     }
 
     @Test

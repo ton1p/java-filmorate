@@ -28,20 +28,7 @@ class GenreStorageTest {
     void getAll() {
         final List<Genre> genres = genreStorage.getAll();
         assertNotNull(genres);
-        assertEquals(0, genres.size());
-    }
-
-    @Test
-    void getAllWithItems() {
-        genreStorage.add("test");
-        genreStorage.add("test1");
-        genreStorage.add("test2");
-        List<Genre> genres = genreStorage.getAll();
-        assertNotNull(genres);
-        assertEquals(3, genres.size());
-        assertEquals("test", genres.get(0).getName());
-        assertEquals("test1", genres.get(1).getName());
-        assertEquals("test2", genres.get(2).getName());
+        assertEquals(6, genres.size());
     }
 
     @Test

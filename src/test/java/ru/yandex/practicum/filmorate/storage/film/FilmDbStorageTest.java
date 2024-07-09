@@ -16,11 +16,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.extractor.FilmExtractor;
 import ru.yandex.practicum.filmorate.storage.film.mapper.FilmRowMapper;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorageImpl;
 import ru.yandex.practicum.filmorate.storage.genre.extractor.GenreExtractor;
 import ru.yandex.practicum.filmorate.storage.genre.mapper.GenreRowMapper;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorageImpl;
 import ru.yandex.practicum.filmorate.storage.mpa.extractor.MpaExtractor;
 import ru.yandex.practicum.filmorate.storage.mpa.mapper.MpaRowMapper;
@@ -61,8 +59,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class FilmDbStorageTest {
     private final FilmStorage filmStorage;
-    private final MpaStorage mpaStorage;
-    private final GenreStorage genreStorage;
     private final UserStorage userStorage;
 
     @Test
@@ -70,11 +66,6 @@ class FilmDbStorageTest {
         Collection<Film> films = filmStorage.getAll();
         assertNotNull(films);
         assertEquals(0, films.size());
-    }
-
-    private void createMpaAndGenres() {
-        List.of("1", "2", "3", "4", "5").forEach(mpaStorage::add);
-        List.of("1", "2", "3", "4", "5", "6").forEach(genreStorage::add);
     }
 
     private Film createFilm() {
@@ -102,20 +93,17 @@ class FilmDbStorageTest {
 
     @Test
     void getById() {
-        createMpaAndGenres();
         Film film = createFilm();
-
         assertNotNull(film);
         assertEquals(1, film.getId());
         assertEquals("test", film.getName());
         assertEquals(1, film.getMpa().getId());
-        assertEquals("1", film.getMpa().getName());
-        assertEquals("1", film.getGenres().getFirst().getName());
+        assertEquals("G", film.getMpa().getName());
+        assertEquals("Комедия", film.getGenres().getFirst().getName());
     }
 
     @Test
     void create() {
-        createMpaAndGenres();
         Film film = createFilm();
 
         assertNotNull(film);
@@ -125,7 +113,6 @@ class FilmDbStorageTest {
 
     @Test
     void update() {
-        createMpaAndGenres();
         Film film = createFilm();
 
         film.setName("updated");
@@ -138,7 +125,6 @@ class FilmDbStorageTest {
 
     @Test
     void likeFilm() {
-        createMpaAndGenres();
         Film film = createFilm();
         User user = createUser();
         filmStorage.likeFilm(film, user);
@@ -149,7 +135,6 @@ class FilmDbStorageTest {
 
     @Test
     void unlikeFilm() {
-        createMpaAndGenres();
         Film film = createFilm();
         User user = createUser();
 
@@ -166,7 +151,6 @@ class FilmDbStorageTest {
 
     @Test
     void getPopular() {
-        createMpaAndGenres();
         Film film = createFilm();
         Film film2 = createFilm();
         Film film3 = createFilm();
