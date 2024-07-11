@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -73,7 +74,7 @@ class FilmControllerTest {
                 .likes(new HashSet<>())
                 .build();
         CreateFilmDto createFilmDto = FilmMapper.INSTANCE.filmToCreateFilmDto(film1);
-        Film film = filmController.createFilm(
+        FilmDto film = filmController.createFilm(
                 createFilmDto
         );
         assertEquals("test", film.getName());
@@ -102,7 +103,7 @@ class FilmControllerTest {
                 .likes(new HashSet<>())
                 .build();
         UpdateFilmDto updateFilmDto = FilmMapper.INSTANCE.filmToUpdateFilmDto(updatedFilm);
-        Film updated = filmController.updateFilm(
+        FilmDto updated = filmController.updateFilm(
                 updateFilmDto
         );
         assertEquals("test updated", updated.getName());
