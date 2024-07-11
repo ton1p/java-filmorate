@@ -10,12 +10,9 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.dto.ObjectWithIdDto;
 import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.BaseStorage;
-import ru.yandex.practicum.filmorate.validator.Validator;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -46,16 +43,12 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
 
     private static final String UPDATE_FILM_QUERY = "update \"film\" set \"name\" = ?, \"description\" = ?, \"release_date\" = ?, \"duration\" = ?, \"mpa\" = ? where \"id\" = ?;";
 
-    private final Validator<Film> filmValidator;
-
     public FilmDbStorage(
             JdbcTemplate jdbcTemplate,
             RowMapper<Film> mapper,
-            ResultSetExtractor<List<Film>> extractor,
-            Validator<Film> filmValidator
+            ResultSetExtractor<List<Film>> extractor
     ) {
         super(jdbcTemplate, mapper, extractor);
-        this.filmValidator = filmValidator;
     }
 
     @Override
@@ -91,44 +84,31 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
 
     @Override
     public Film create(CreateFilmDto createFilmDto) {
-        Film film = FilmMapper.INSTANCE.createFilmDtoToFilm(createFilmDto);
-        if (filmValidator.isValid(film)) {
-            int id = insert(
-                    CREATE_FILM_QUERY,
-                    createFilmDto.getName(),
-                    createFilmDto.getDescription(),
-                    createFilmDto.getReleaseDate().toString(),
-                    createFilmDto.getDuration().toMinutes(),
-                    createFilmDto.getMpa().getId()
-            );
-            addGenresToFilm(id, createFilmDto.getGenres());
-            Optional<Film> createdFilm = findOne(GET_BY_ID_QUERY, id);
-            return createdFilm.orElse(null);
-        }
-        return null;
+        int id = insert(
+                CREATE_FILM_QUERY,
+                createFilmDto.getName(),
+                createFilmDto.getDescription(),
+                createFilmDto.getReleaseDate().toString(),
+                createFilmDto.getDuration().toMinutes(),
+                createFilmDto.getMpa().getId()
+        );
+        addGenresToFilm(id, createFilmDto.getGenres());
+        return findOne(GET_BY_ID_QUERY, id).orElse(null);
     }
 
     @Override
     public Film update(UpdateFilmDto updateFilmDto) {
-        Optional<Film> founded = findOne(GET_BY_ID_QUERY, updateFilmDto.getId());
-        if (founded.isEmpty()) {
-            throw new NotFoundException("Фильм с id = " + updateFilmDto.getId() + " не найден");
-        }
-        Film film = FilmMapper.INSTANCE.updateFilmDtoToFilm(updateFilmDto);
-        if (filmValidator.isValid(film)) {
-            update(
-                    UPDATE_FILM_QUERY,
-                    updateFilmDto.getName(),
-                    updateFilmDto.getDescription(),
-                    updateFilmDto.getReleaseDate().toString(),
-                    updateFilmDto.getDuration().toMinutes(),
-                    updateFilmDto.getMpa().getId(),
-                    updateFilmDto.getId()
-            );
+        update(
+                UPDATE_FILM_QUERY,
+                updateFilmDto.getName(),
+                updateFilmDto.getDescription(),
+                updateFilmDto.getReleaseDate().toString(),
+                updateFilmDto.getDuration().toMinutes(),
+                updateFilmDto.getMpa().getId(),
+                updateFilmDto.getId()
+        );
 
-            return findOne(GET_BY_ID_QUERY, updateFilmDto.getId()).orElse(null);
-        }
-        return null;
+        return findOne(GET_BY_ID_QUERY, updateFilmDto.getId()).orElse(null);
     }
 
     @Override

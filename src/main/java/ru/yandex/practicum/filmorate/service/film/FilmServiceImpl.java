@@ -6,10 +6,12 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
 import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.validator.Validator;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
     private final UserService userService;
+    private final Validator<Film> filmValidator;
 
     @Override
     public Collection<Film> getAll() {
@@ -36,12 +39,20 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(CreateFilmDto createFilmDto) {
-        return filmStorage.create(createFilmDto);
+        Film film = FilmMapper.INSTANCE.createFilmDtoToFilm(createFilmDto);
+        if (filmValidator.isValid(film)) {
+            return filmStorage.create(createFilmDto);
+        }
+        return null;
     }
 
     @Override
     public Film update(UpdateFilmDto updateFilmDto) {
-        return filmStorage.update(updateFilmDto);
+        Film film = getById(updateFilmDto.getId());
+        if (filmValidator.isValid(film)) {
+            return filmStorage.update(updateFilmDto);
+        }
+        return null;
     }
 
     @Override

@@ -16,6 +16,8 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validator.Validator;
+import ru.yandex.practicum.filmorate.validator.film.InMemoryFilmValidator;
 import ru.yandex.practicum.filmorate.validator.user.UserValidator;
 
 import java.time.Duration;
@@ -34,7 +36,8 @@ class FilmControllerTest {
         UserStorage userStorage = new InMemoryUserStorage();
         UserValidator userValidator = new UserValidator();
         UserService userService = new UserServiceImpl(userStorage, userValidator);
-        FilmService filmService = new FilmServiceImpl(filmStorage, userService);
+        Validator<Film> filmValidator = new InMemoryFilmValidator();
+        FilmService filmService = new FilmServiceImpl(filmStorage, userService, filmValidator);
         filmController = new FilmController(filmService);
     }
 
