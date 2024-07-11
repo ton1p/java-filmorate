@@ -72,17 +72,19 @@ public class FilmDbStorage extends BaseStorage<Film> implements FilmStorage {
         if (genres == null || genres.isEmpty()) {
             return;
         }
+
+        List<Integer> ids = genres.stream().map(ObjectWithIdDto::getId).distinct().toList();
+
         jdbcTemplate.batchUpdate(ADD_FILM_GENRE_QUERY, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(@NonNull PreparedStatement ps, int i) throws SQLException {
-                ObjectWithIdDto genre = genres.get(i);
                 ps.setInt(1, filmId);
-                ps.setInt(2, genre.getId());
+                ps.setInt(2, ids.get(i));
             }
 
             @Override
             public int getBatchSize() {
-                return genres.size();
+                return ids.size();
             }
         });
     }
