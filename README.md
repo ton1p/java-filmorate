@@ -1,2 +1,5 @@
-# java-filmorate
-Template repository for Filmorate project.
+# Filmorate
+
+### Entity relationship
+
+![entity relationship](src/main/resources/filmorate.png)

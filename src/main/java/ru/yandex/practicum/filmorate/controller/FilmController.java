@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.dto.film.CreateFilmDto;
+import ru.yandex.practicum.filmorate.dto.film.FilmDto;
+import ru.yandex.practicum.filmorate.dto.film.UpdateFilmDto;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import java.util.Collection;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -24,25 +27,25 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping
-    public Collection<Film> getFilms() {
+    public Collection<FilmDto> getFilms() {
         log.info("Получение всех фильмов");
         return filmService.getAll();
     }
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable("id") int id) {
+    public FilmDto getFilmById(@PathVariable("id") int id) {
         log.info("Получение фильма по id = {}", id);
         return filmService.getById(id);
     }
 
     @PostMapping
-    public Film createFilm(@RequestBody Film body) {
+    public FilmDto createFilm(@RequestBody CreateFilmDto body) {
         log.info("Создание нового фильма");
         return filmService.create(body);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film body) {
+    public FilmDto updateFilm(@RequestBody UpdateFilmDto body) {
         log.info("Обновление фильма");
         return filmService.update(body);
     }
@@ -60,7 +63,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getFilmsPopular(@RequestParam(defaultValue = "10") int count) {
+    public List<FilmDto> getFilmsPopular(@RequestParam(defaultValue = "10") int count) {
         log.info("Получение самых популярных фильмов с параметром count = {}", count);
         return filmService.getPopular(count);
     }

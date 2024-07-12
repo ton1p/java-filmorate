@@ -2,17 +2,19 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.service.user.UserServiceImpl;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.validator.user.UserValidator;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,132 +37,125 @@ class UserControllerTest {
 
     @Test
     void createUser() {
-        userController.createUser(User
+        CreateUserDto createUserDto = CreateUserDto
                 .builder()
-                .id(1)
                 .email("test@test.com")
                 .login("login")
                 .name("name")
                 .birthday(LocalDate.now())
-                .friends(new HashSet<>())
-                .build()
-        );
+                .build();
+        userController.createUser(createUserDto);
         assertEquals(1, userController.getUsers().size());
     }
 
     @Test
     void updateUser() {
-        User user = User
+        CreateUserDto userDto = CreateUserDto
                 .builder()
-                .id(1)
                 .email("test@test.com")
                 .login("login")
                 .name("name")
                 .birthday(LocalDate.now())
-                .friends(new HashSet<>())
                 .build();
 
-        userController.createUser(user);
+        User user = userController.createUser(userDto);
         user.setName("updated");
-        User updated = userController.updateUser(user);
+        UpdateUserDto updateUserDto = UserMapper.INSTANCE.userToUpdateUserDto(user);
+        User updated = userController.updateUser(updateUserDto);
         assertEquals("updated", updated.getName());
     }
 
 
     @Test
     void shouldThrowNotFoundExceptionWhenUpdatingByWrongId() {
-        User user = User
+        UpdateUserDto updateUserDto = UpdateUserDto
                 .builder()
                 .id(1)
                 .email("test@test.com")
                 .login("login")
                 .name("name")
-                .friends(new HashSet<>())
                 .build();
 
-        assertThrows(NotFoundException.class, () -> userController.updateUser(user));
+        assertThrows(NotFoundException.class, () -> userController.updateUser(updateUserDto));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenEmailIsNullOrEmpty() {
-        User user = User
+        CreateUserDto createUserDto = CreateUserDto
                 .builder()
-                .id(1)
                 .name("name")
                 .login("login")
                 .birthday(LocalDate.now())
                 .build();
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
 
-        user.setEmail("");
+        createUserDto.setEmail("");
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenEmailIsIncorrect() {
-        User user = User
+        CreateUserDto createUserDto = CreateUserDto
                 .builder()
-                .id(1)
                 .name("name")
                 .login("login")
                 .birthday(LocalDate.now())
                 .email("test")
                 .build();
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenLoginIsNullOrEmpty() {
-        User user = User
+        CreateUserDto createUserDto = CreateUserDto
                 .builder()
-                .id(1)
                 .name("name")
                 .birthday(LocalDate.now())
                 .email("test@test.com")
                 .build();
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
 
-        user.setLogin("");
+        createUserDto.setLogin("");
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenLoginContainSpace() {
-        User user = new User();
-        user.setId(1);
-        user.setName("test");
-        user.setBirthday(LocalDate.now());
-        user.setEmail("test@test.com");
-        user.setLogin("te st");
+        CreateUserDto createUserDto = CreateUserDto.builder()
+                .name("name")
+                .birthday(LocalDate.now())
+                .email("test@test.com")
+                .login("te st")
+                .build();
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenBirthdayIsNull() {
-        User user = new User();
-        user.setId(1);
-        user.setName("test");
-        user.setEmail("test@test.com");
-        user.setLogin("test");
+        CreateUserDto createUserDto = CreateUserDto.builder()
+                .name("name")
+                .email("test@test.com")
+                .login("test")
+                .build();
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
     }
 
     @Test
     void shouldThrowValidationExceptionWhenBirthdayIsInFuture() {
-        User user = new User();
-        user.setId(1);
-        user.setName("test");
-        user.setEmail("test@test.com");
-        user.setLogin("test");
-        user.setBirthday(LocalDate.now().plusDays(1));
+        CreateUserDto createUserDto = CreateUserDto.builder()
+                .name("name")
+                .email("test@test.com")
+                .login("test")
+                .birthday(LocalDate.now().plusDays(1))
+                .build();
 
-        assertThrows(ValidationException.class, () -> userController.createUser(user));
+        assertThrows(ValidationException.class, () -> userController.createUser(createUserDto));
     }
 }

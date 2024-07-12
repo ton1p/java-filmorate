@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.ArrayList;
@@ -47,7 +50,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User create(User user) {
+    public User create(CreateUserDto createUserDto) {
+        User user = UserMapper.INSTANCE.createUserDtoToUser(createUserDto);
         user.setId(getNextId());
         if (user.getName() == null) {
             user.setName(user.getLogin());
@@ -57,7 +61,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user) {
+    public User update(UpdateUserDto updateUserDto) {
+        User user = UserMapper.INSTANCE.updateUserDtoToUser(updateUserDto);
         userMap.put(user.getId(), user);
         return user;
     }

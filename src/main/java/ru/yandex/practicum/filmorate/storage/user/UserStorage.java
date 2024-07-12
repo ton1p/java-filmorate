@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import ru.yandex.practicum.filmorate.dto.user.CreateUserDto;
+import ru.yandex.practicum.filmorate.dto.user.UpdateUserDto;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -11,9 +13,9 @@ public interface UserStorage {
 
     Optional<User> getById(int id);
 
-    User create(User user);
+    User create(CreateUserDto user);
 
-    User update(User user);
+    User update(UpdateUserDto user);
 
     void addFriend(User user, User friend);
 

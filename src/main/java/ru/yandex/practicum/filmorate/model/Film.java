@@ -12,11 +12,9 @@ import ru.yandex.practicum.filmorate.adapter.LocalDateSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
-/**
- * Film.
- */
 @Data
 @Builder
 @AllArgsConstructor
@@ -36,4 +34,8 @@ public class Film {
     private Duration duration;
 
     private Set<Integer> likes;
+
+    private Mpa mpa;
+
+    private List<Genre> genres;
 }
